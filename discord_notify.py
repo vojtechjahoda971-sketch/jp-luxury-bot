@@ -25,15 +25,17 @@ def _format_age(seconds_listed):
 
 def build_embed(item, brand_name, category_label, price_eur, is_discount, age_seconds, color):
     condition = item.get("condition") or "neuvedeno"
-    title = item["name"][:250]
+    jp_name = item["name"][:250]
+    display_title = (item.get("name_en") or jp_name)[:250]
     fields = [
         {"name": "Cena", "value": f"¥{item['price']:,} (~€{price_eur:,.2f})", "inline": True},
         {"name": "Stav", "value": condition, "inline": True},
         {"name": "V nabídce", "value": _format_age(age_seconds), "inline": True},
         {"name": "Kategorie", "value": category_label, "inline": True},
+        {"name": "Japonský název", "value": jp_name[:1000], "inline": False},
     ]
     embed = {
-        "title": f"{'🔥 SLEVA — ' if is_discount else ''}{title}",
+        "title": f"{'🔥 SLEVA — ' if is_discount else ''}{display_title}",
         "url": item["url"],
         "color": color,
         "fields": fields,
