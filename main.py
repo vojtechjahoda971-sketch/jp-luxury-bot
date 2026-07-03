@@ -15,6 +15,7 @@ import os
 import statistics
 import sys
 import time
+from datetime import datetime, timezone
 
 from mercapi import Mercapi
 
@@ -66,7 +67,16 @@ def normalize_item(raw_item):
     if cond_obj is not None:
         condition = getattr(cond_obj, "name", None) or str(cond_obj)
 
-    created = getattr(raw_item, "created", None)
+    created_raw = getattr(raw_item, "created", None)
+    created_ts = None
+    if created_raw is not None:
+        if isinstance(created_raw, datetime):
+            # mercapi vrací datetime objekt -> převedeme na unix timestamp (sekundy).
+            dt = created_raw if created_raw.tzinfo else created_raw.replace(tzinfo=timezone.utc)
+            created_ts = int(dt.timestamp())
+        elif isinstance(created_raw, (int, float)):
+            created_ts = int(created_raw)
+        # jiné/neznámé typy necháme jako None, ať to bota nespadne
 
     return {
         "id": item_id,
@@ -74,7 +84,7 @@ def normalize_item(raw_item):
         "price": price,
         "thumbnail": thumbnail,
         "condition": condition,
-        "created": created,
+        "created": created_ts,
         "url": f"https://jp.mercari.com/item/{item_id}",
     }
 
