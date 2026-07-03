@@ -19,8 +19,6 @@ BRANDS = {
     "Louis Vuitton": {"jp": "ルイヴィトン", "color": 0x8B5E3C},
     "Gucci": {"jp": "グッチ", "color": 0x006341},
     "Chanel": {"jp": "シャネル", "color": 0x111111},
-    "Hermès": {"jp": "エルメス", "color": 0xFF7900},
-    "Cartier": {"jp": "カルティエ", "color": 0xB90E28},
 }
 
 # Kolik posledních (dle výpisu vyhledávání) položek se má z každého dotazu
@@ -40,10 +38,25 @@ DISCOUNT_RATIO = 0.75
 # upozorněním). Mercari inzerát má stabilní ID, takže stačí množina.
 SEEN_IDS_PER_QUERY = 500
 
-# Minimální cena (v JPY), aby byla položka vůbec vyhodnocena a poslána jako
-# upozornění. Odfiltruje levné klíčenky, drobné doplňky apod.
-# ~5 000 ¥ odpovídá zhruba 30 € (dle aktuálního kurzu se to trochu hýbe).
+# Minimální a maximální cena (v JPY), aby byla položka vůbec vyhodnocena a
+# poslána jako upozornění.
+# ~5 000 ¥ ≈ 30 €, ~17 000 ¥ ≈ 100 € (dle aktuálního kurzu se to trochu hýbe).
 MIN_PRICE_JPY = 5000
+MAX_PRICE_JPY = 17000
+
+# Klíčová slova, která v japonském názvu inzerátu prozradí, že jde o repliku/
+# padělek přiznaný samotným prodejcem -> takové položky se rovnou přeskočí.
+# POZOR: toto NENÍ záruka pravosti, jen filtr na zjevně přiznané padělky.
+# Nepoctivý prodejce padělku prostě tahle slova nepoužije - skutečné ověření
+# (sériové číslo, datakód, řemeslné detaily) je potřeba udělat ručně před koupí.
+FAKE_ITEM_KEYWORDS = [
+    "レプリカ",      # replika
+    "コピー品",      # kopie
+    "スーパーコピー", # "super copy" (běžné označení pro padělky v JP bazarech)
+    "非正規品",      # neoriginální/neautorizované zboží
+    "偽物",          # padělek
+    "フェイク",      # "fake"
+]
 
 CURRENCY_FROM = "JPY"
 CURRENCY_TO = "EUR"
