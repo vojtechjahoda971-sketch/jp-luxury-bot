@@ -19,12 +19,8 @@ BRANDS = {
     "Louis Vuitton": {"jp": "ルイヴィトン", "color": 0x8B5E3C},
     "Gucci": {"jp": "グッチ", "color": 0x006341},
     "Chanel": {"jp": "シャネル", "color": 0x111111},
-    "Coach": {"jp": "コーチ", "color": 0xB5651D},
-    "Céline": {"jp": "セリーヌ", "color": 0xD4AF37},
     "Hermès": {"jp": "エルメス", "color": 0xFF7900},
     "Cartier": {"jp": "カルティエ", "color": 0xB90E28},
-    "Vivienne Westwood": {"jp": "ヴィヴィアン ウエストウッド", "color": 0x7B2D8E},
-    "Porter": {"jp": "ポーター", "color": 0x2F4F4F},
 }
 
 # Kolik posledních (dle výpisu vyhledávání) položek se má z každého dotazu
@@ -46,7 +42,8 @@ SEEN_IDS_PER_QUERY = 500
 
 # Minimální cena (v JPY), aby byla položka vůbec vyhodnocena a poslána jako
 # upozornění. Odfiltruje levné klíčenky, drobné doplňky apod.
-MIN_PRICE_JPY = 20000
+# ~5 000 ¥ odpovídá zhruba 30 € (dle aktuálního kurzu se to trochu hýbe).
+MIN_PRICE_JPY = 5000
 
 CURRENCY_FROM = "JPY"
 CURRENCY_TO = "EUR"
