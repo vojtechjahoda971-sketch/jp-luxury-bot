@@ -25,9 +25,11 @@ from config import (
     ITEMS_PER_QUERY,
     DISCOUNT_RATIO,
     DISCORD_WEBHOOK_URL_ENV,
+    MIN_PRICE_JPY,
 )
 from currency import get_jpy_eur_rate, jpy_to_eur
 from discord_notify import build_embed, send_alerts
+from translate import translate_ja_to_en
 from state_store import (
     load_state,
     save_state,
@@ -137,12 +139,17 @@ async def run():
                 history = get_price_history(state, query_key)
                 median_price = statistics.median(history) if len(history) >= 5 else None
 
-                for it in new_items:
+                # Levné drobnosti (klíčenky apod.) se nezobrazují jako upozornění,
+                # ale POČÍTAJÍ se jako "viděné", ať se pořád dokola nekontrolují.
+                alertable_items = [it for it in new_items if it["price"] >= MIN_PRICE_JPY]
+
+                for it in alertable_items:
                     is_discount = bool(
                         median_price and it["price"] < median_price * DISCOUNT_RATIO
                     )
                     age_seconds = (now - it["created"]) if it.get("created") else None
                     price_eur = jpy_to_eur(it["price"], rate)
+                    it["name_en"] = translate_ja_to_en(it["name"])
                     embed = build_embed(
                         item=it,
                         brand_name=brand_name,
@@ -155,7 +162,7 @@ async def run():
                     brand_embeds.append(embed)
 
                 add_seen_ids(state, query_key, [it["id"] for it in new_items])
-                total_new += len(new_items)
+                total_new += len(alertable_items)
 
             # Krátká pauza mezi dotazy, abychom nebyli agresivní vůči Mercari.
             await asyncio.sleep(1.5)
