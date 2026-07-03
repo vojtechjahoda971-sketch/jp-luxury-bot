@@ -26,6 +26,8 @@ from config import (
     DISCOUNT_RATIO,
     DISCORD_WEBHOOK_URL_ENV,
     MIN_PRICE_JPY,
+    MAX_PRICE_JPY,
+    FAKE_ITEM_KEYWORDS,
 )
 from currency import get_jpy_eur_rate, jpy_to_eur
 from discord_notify import build_embed, send_alerts
@@ -91,6 +93,10 @@ def normalize_item(raw_item):
     }
 
 
+def looks_like_fake(name):
+    return any(kw in name for kw in FAKE_ITEM_KEYWORDS)
+
+
 async def fetch_query(mercapi_client, query):
     try:
         results = await mercapi_client.search(query)
@@ -139,9 +145,15 @@ async def run():
                 history = get_price_history(state, query_key)
                 median_price = statistics.median(history) if len(history) >= 5 else None
 
-                # Levné drobnosti (klíčenky apod.) se nezobrazují jako upozornění,
-                # ale POČÍTAJÍ se jako "viděné", ať se pořád dokola nekontrolují.
-                alertable_items = [it for it in new_items if it["price"] >= MIN_PRICE_JPY]
+                # Levné drobnosti, moc drahé kusy mimo rozpočet a inzeráty,
+                # co samy přiznávají repliku/padělek, se nezobrazují jako
+                # upozornění, ale POČÍTAJÍ se jako "viděné", ať se pořád
+                # dokola nekontrolují.
+                alertable_items = [
+                    it for it in new_items
+                    if MIN_PRICE_JPY <= it["price"] <= MAX_PRICE_JPY
+                    and not looks_like_fake(it["name"])
+                ]
 
                 for it in alertable_items:
                     is_discount = bool(
