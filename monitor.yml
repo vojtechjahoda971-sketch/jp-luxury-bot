@@ -1,0 +1,41 @@
+name: JP Luxury Watcher
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # každých 15 minut (čas UTC, GitHub cron negarantuje přesnost na minutu)
+  workflow_dispatch: {}       # umožní i ruční spuštění přes záložku Actions
+
+permissions:
+  contents: write            # potřeba, aby workflow mohl commitnout aktualizovaný state.json
+
+concurrency:
+  group: jp-luxury-watcher
+  cancel-in-progress: false  # ať se nepřekrývají dva běhy najednou
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repozitáře
+        uses: actions/checkout@v4
+
+      - name: Nastavení Pythonu
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalace závislostí
+        run: pip install -r requirements.txt
+
+      - name: Spuštění bota
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python main.py
+
+      - name: Uložení aktualizovaného stavu (state.json)
+        run: |
+          git config user.name "jp-luxury-watcher-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add state.json
+          git diff --quiet --cached || git commit -m "chore: update state [skip ci]"
+          git push
