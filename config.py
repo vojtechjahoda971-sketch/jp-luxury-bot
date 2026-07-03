@@ -44,6 +44,10 @@ DISCOUNT_RATIO = 0.75
 # upozorněním). Mercari inzerát má stabilní ID, takže stačí množina.
 SEEN_IDS_PER_QUERY = 500
 
+# Minimální cena (v JPY), aby byla položka vůbec vyhodnocena a poslána jako
+# upozornění. Odfiltruje levné klíčenky, drobné doplňky apod.
+MIN_PRICE_JPY = 20000
+
 CURRENCY_FROM = "JPY"
 CURRENCY_TO = "EUR"
 # Když se nepodaří stáhnout aktuální kurz, použije se tento záložní (přibližný).
